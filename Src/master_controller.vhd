@@ -80,6 +80,27 @@ architecture Behavioral of master_controller is
              sda => sda,
              scl => scl);
              
+--     ENTITY i2s_transceiver IS
+--               GENERIC(
+--                 mclk_sclk_ratio  :  INTEGER := 4;    --number of mclk periods per sclk period
+--                 sclk_ws_ratio    :  INTEGER := 64;   --number of sclk periods per word select period
+--                 d_width          :  INTEGER := 24);  --data width
+--               PORT(
+--                 reset_n    :  IN   STD_LOGIC;                             --asynchronous active low reset
+--                 mclk       :  IN   STD_LOGIC;                             --master clock
+--                 sclk       :  OUT  STD_LOGIC;                             --serial clock (or bit clock)
+--                 ws         :  OUT  STD_LOGIC;                             --word select (or left-right clock)
+--                 sd_tx      :  OUT  STD_LOGIC;                             --serial data transmit
+--                 sd_rx      :  IN   STD_LOGIC;                             --serial data receive
+--                 l_data_tx  :  IN   STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --left channel data to transmit
+--                 r_data_tx  :  IN   STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --right channel data to transmit
+--                 l_data_rx  :  OUT  STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --left channel data received
+--                 r_data_rx  :  OUT  STD_LOGIC_VECTOR(d_width-1 DOWNTO 0)); --right channel data received
+--             END i2s_transceiver;
+--        i2s_1 : entity work.i2s_transceiver
+--        generic map(mclk_sclk_ratio => 8,
+                    
+             
     process (clk, rst)
     begin
         if rising_edge(clk) then
