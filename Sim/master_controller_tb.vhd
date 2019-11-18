@@ -43,6 +43,8 @@ architecture Behavioral of master_controller_tb is
     signal error_led : STD_LOGIC;
     signal MCLK_SGTL5000 : STD_LOGIC;
     signal LRCLK_SGTL5000 : STD_LOGIC;
+    signal BCLK_SGTL5000 : STD_LOGIC;
+    signal DIN_SGTL5000 : STD_LOGIC;
 begin
 
     master_1 : entity work.master_controller
@@ -54,8 +56,8 @@ begin
               rx_sig => '0',
               MCLK_SGTL5000 => MCLK_SGTL5000,
               LRCLK_SGTL5000 => LRCLK_SGTL5000,
-              BCLK_SGTL5000 => '0',
-              DIN_SGTL5000 => '0',
+              BCLK_SGTL5000 => BCLK_SGTL5000,
+              DIN_SGTL5000 => DIN_SGTL5000,
               DOUT_SGTL5000 => '0');
     
     process
@@ -67,5 +69,4 @@ begin
     end process;
     
     rst_inv <= '0', '1' after 100ns;
-    LRCLK_SGTL5000 <= '0';
 end Behavioral;

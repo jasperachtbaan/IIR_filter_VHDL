@@ -41,8 +41,8 @@ entity master_controller is
          error_led : out STD_LOGIC;
          rx_sig : in STD_LOGIC;
          MCLK_SGTL5000 : out STD_LOGIC;
-         LRCLK_SGTL5000 : in STD_LOGIC;
-         BCLK_SGTL5000 : in STD_LOGIC;
+         LRCLK_SGTL5000 : out STD_LOGIC;
+         BCLK_SGTL5000 : out STD_LOGIC;
          DIN_SGTL5000 : out STD_LOGIC;
          DOUT_SGTL5000 : in STD_LOGIC);
 end master_controller;
@@ -65,6 +65,13 @@ architecture Behavioral of master_controller is
     signal startupCount : integer range 0 to 100000;
     signal setupCount : integer range 0 to setup_num;
     
+    constant n : integer := 24;
+    signal in_data : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    signal out_data : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    
+    signal i2s_reset_inv : STD_LOGIC;
+    signal LRCLK : STD_LOGIC;
+    
     begin
     SGTL5000_1 : entity work.SGTL5000_reg_write
     generic map(input_clk => 24_000_000,
@@ -79,26 +86,29 @@ architecture Behavioral of master_controller is
              ack_error => reg_write_ack_error,
              sda => sda,
              scl => scl);
+
+    i2s_1 : entity work.i2s_transceiver
+    generic map(mclk_sclk_ratio => 4,
+                sclk_ws_ratio => 64,
+                d_width => 24)
+    port map(reset_n => i2s_reset_inv,
+             mclk => MCLK_SGTL5000_buf,
+             sclk => BCLK_SGTL5000,
+             ws => LRCLK,
+             sd_tx => DIN_SGTL5000,
+             sd_rx => DOUT_SGTL5000,
+             l_data_tx => out_data,
+             r_data_tx => out_data,
+             l_data_rx => in_data,
+             r_data_rx => open);
              
---     ENTITY i2s_transceiver IS
---               GENERIC(
---                 mclk_sclk_ratio  :  INTEGER := 4;    --number of mclk periods per sclk period
---                 sclk_ws_ratio    :  INTEGER := 64;   --number of sclk periods per word select period
---                 d_width          :  INTEGER := 24);  --data width
---               PORT(
---                 reset_n    :  IN   STD_LOGIC;                             --asynchronous active low reset
---                 mclk       :  IN   STD_LOGIC;                             --master clock
---                 sclk       :  OUT  STD_LOGIC;                             --serial clock (or bit clock)
---                 ws         :  OUT  STD_LOGIC;                             --word select (or left-right clock)
---                 sd_tx      :  OUT  STD_LOGIC;                             --serial data transmit
---                 sd_rx      :  IN   STD_LOGIC;                             --serial data receive
---                 l_data_tx  :  IN   STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --left channel data to transmit
---                 r_data_tx  :  IN   STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --right channel data to transmit
---                 l_data_rx  :  OUT  STD_LOGIC_VECTOR(d_width-1 DOWNTO 0);  --left channel data received
---                 r_data_rx  :  OUT  STD_LOGIC_VECTOR(d_width-1 DOWNTO 0)); --right channel data received
---             END i2s_transceiver;
---        i2s_1 : entity work.i2s_transceiver
---        generic map(mclk_sclk_ratio => 8,
+    iir1 : entity work.iir_2nd_order
+    generic map(n)
+    port map(clk,
+             rst,
+             LRCLK,
+             in_data,
+             out_data);
                     
              
     process (clk, rst)
@@ -112,6 +122,7 @@ architecture Behavioral of master_controller is
                 state <= wait_startup;
                 startupCount <= 0;
                 setupCount <= 0;
+                i2s_reset_inv <= '0';
             else
             	MCLK_SGTL5000_buf <= not(MCLK_SGTL5000_buf);
                 case state is
@@ -119,6 +130,7 @@ architecture Behavioral of master_controller is
                         reg_write_start <= '0';
                         data_buf <= (others => '0');
                         addr_buf <= (others => '0');
+                        i2s_reset_inv <= '0';
                         --setupCount <= 0;
                         
                         if (startupCount = 99999) then
@@ -133,6 +145,7 @@ architecture Behavioral of master_controller is
                     when SGTL5000_setup =>
                         data_buf <= SGTL5000_settings(setupCount)(15 downto 0); 
                         addr_buf <= SGTL5000_settings(setupCount)(31 downto 16);
+                        i2s_reset_inv <= '0';
                         if (reg_write_busy = '0') then
                             reg_write_start <= '1';
                         else
@@ -152,12 +165,14 @@ architecture Behavioral of master_controller is
                     when running =>
                     	data_buf <= (others => '0');
                     	data_buf <= (others => '0');
+                    	i2s_reset_inv <= '1';
                         state <= running;
                         reg_write_start <= '0';
                         
                     when others =>
                         data_buf <= (others => '0');
                         data_buf <= (others => '0');
+                        i2s_reset_inv <= '0';
                         state <= running;
                         reg_write_start <= '0';
                 end case;
@@ -168,5 +183,5 @@ architecture Behavioral of master_controller is
     rst <= not(rst_inv); --Board has an active low reset button
     error_led <= reg_write_ack_error;
     MCLK_SGTL5000 <= MCLK_SGTL5000_buf;
-    DIN_SGTL5000 <= '0';
+    LRCLK_SGTL5000 <= LRCLK;
 end Behavioral;
