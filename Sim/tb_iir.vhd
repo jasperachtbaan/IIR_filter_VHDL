@@ -66,24 +66,27 @@ begin
         variable audio_sig : std_logic_vector((n - 1) downto 0);
     begin
         file_open(file_VECTORS, "Lovestad.bin",  read_mode);
-        file_open(file_RESULTS, "output_results.txt", write_mode);
+        --file_open(file_RESULTS, "output_results.txt", write_mode);
         
         while not endfile(file_VECTORS) loop
             readline(file_VECTORS, v_ILINE);
             read(v_ILINE, audio_sig);
-            data_in <= audio_sig;
+            --data_in <= audio_sig;
+            data_in <= "011111111111111111111111";
             
             write(v_OLINE, conv_integer(data_out), right, n);
-            writeline(file_RESULTS, v_OLINE);
+           -- writeline(file_RESULTS, v_OLINE);
             
             clk_48k <= '1';
-            wait for 10.4166667us;
+            wait for 5.20833335us; --96kHz
+            --wait for 10.4166667us; --48kHz
             clk_48k <= '0';
-            wait for 10.4166667us;
+            wait for 5.20833335us; --96kHz
+            --wait for 10.4166667us; --48kHz
         end loop;
         
         file_close(file_VECTORS);
-        file_close(file_VECTORS);
+        --file_close(file_VECTORS);
     end process;
     
     rst <= '1', '0' after 100ns;

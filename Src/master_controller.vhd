@@ -41,8 +41,8 @@ entity master_controller is
          error_led : out STD_LOGIC;
          rx_sig : in STD_LOGIC;
          MCLK_SGTL5000 : out STD_LOGIC;
-         LRCLK_SGTL5000 : in STD_LOGIC;
-         BCLK_SGTL5000 : in STD_LOGIC;
+         LRCLK_SGTL5000 : out STD_LOGIC;
+         BCLK_SGTL5000 : out STD_LOGIC;
          DIN_SGTL5000 : out STD_LOGIC;
          DOUT_SGTL5000 : in STD_LOGIC);
 end master_controller;
@@ -71,6 +71,7 @@ architecture Behavioral of master_controller is
     
     signal i2s_reset_inv : STD_LOGIC;
     signal DIN_buf : STD_LOGIC;
+    signal LRCLK : STD_LOGIC;
     
     begin
     SGTL5000_1 : entity work.SGTL5000_reg_write
@@ -86,14 +87,29 @@ architecture Behavioral of master_controller is
              ack_error => reg_write_ack_error,
              sda => sda,
              scl => scl);
+
+    i2s_1 : entity work.i2s_transceiver
+    generic map(mclk_sclk_ratio => 4,
+                sclk_ws_ratio => 64,
+                d_width => 24)
+    port map(reset_n => i2s_reset_inv,
+             mclk => MCLK_SGTL5000_buf,
+             sclk => BCLK_SGTL5000,
+             ws => LRCLK,
+             sd_tx => DIN_SGTL5000,
+             sd_rx => DOUT_SGTL5000,
+             l_data_tx => out_data,
+             r_data_tx => out_data,
+             l_data_rx => in_data,
+             r_data_rx => open);
              
     iir1 : entity work.iir_2nd_order
     generic map(n)
-    port map(clk,
-             rst,
-             LRCLK_SGTL5000,
-             (others => '0'),
-             out_data);
+    port map(clk => clk,
+             rst => rst,
+             clk_48k => LRCLK,
+             data_in => in_data,
+             data_out  => out_data);
                     
              
     process (clk, rst)
@@ -164,9 +180,10 @@ architecture Behavioral of master_controller is
             end if;
         end if;
     end process;
-    DIN_buf <= DOUT_SGTL5000;
-    DIN_SGTL5000 <= DIN_buf;
+
     MCLK_SGTL5000 <= MCLK_SGTL5000_buf;
+    LRCLK_SGTL5000 <= LRCLK;
+    
     rst <= not(rst_inv); --Board has an active low reset button
     error_led <= reg_write_ack_error;
 end Behavioral;

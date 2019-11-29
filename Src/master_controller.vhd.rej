@@ -1,0 +1,8 @@
+diff a/Src/master_controller.vhd b/Src/master_controller.vhd	(rejected hunks)
+@@ -170,6 +170,4 @@
+     MCLK_SGTL5000 <= MCLK_SGTL5000_buf;
+     rst <= not(rst_inv); --Board has an active low reset button
+     error_led <= reg_write_ack_error;
+-    MCLK_SGTL5000 <= MCLK_SGTL5000_buf;
+-    LRCLK_SGTL5000 <= LRCLK;
+ end Behavioral;

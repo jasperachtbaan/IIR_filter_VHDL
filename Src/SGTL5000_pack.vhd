@@ -19,7 +19,7 @@ package SGTL5000_pack is
     constant SGTL5000_CHIP_ANA_CTRL         : std_logic_vector(15 downto 0) := x"0024";
     constant SGTL5000_CHIP_LINREG_CTRL      : std_logic_vector(15 downto 0) := x"0026";
     constant SGTL5000_CHIP_REF_CTRL         : std_logic_vector(15 downto 0) := x"0028";
-    constant SGTL5000_CHIP_MIC_CTRL        : std_logic_vector(15 downto 0) := x"002a";
+    constant SGTL5000_CHIP_MIC_CTRL         : std_logic_vector(15 downto 0) := x"002a";
     constant SGTL5000_CHIP_LINE_OUT_CTRL    : std_logic_vector(15 downto 0) := x"002c";
     constant SGTL5000_CHIP_LINE_OUT_VOL     : std_logic_vector(15 downto 0) := x"002e";
     constant SGTL5000_CHIP_ANA_POWER        : std_logic_vector(15 downto 0) := x"0030";
@@ -65,7 +65,7 @@ package SGTL5000_pack is
     signal SGTL5000_settings : SETUP_VECT := ( SGTL5000_CHIP_ANA_POWER & x"4160",
                                                SGTL5000_CHIP_LINREG_CTRL & x"006C",
                                                SGTL5000_CHIP_PLL_CTRL & x"8312",
-                                               SGTL5000_CHIP_I2S_CTRL & x"0090",
+                                               SGTL5000_CHIP_I2S_CTRL & x"0010",
                                                SGTL5000_CHIP_LINE_OUT_CTRL & x"0F22",
                                                SGTL5000_CHIP_SHORT_CTRL & x"4446",
                                                SGTL5000_CHIP_ANA_CTRL & x"0137",
@@ -78,9 +78,9 @@ package SGTL5000_pack is
                                                SGTL5000_CHIP_DAC_VOL & x"3C3C",
                                                SGTL5000_CHIP_ANA_HP_CTRL & x"3030",
                                                SGTL5000_CHIP_ANA_CTRL & x"0026",
-                                               SGTL5000_CHIP_PAD_STRENGTH & x"03FF",
+                                               SGTL5000_CHIP_PAD_STRENGTH & x"0030",
                                                SGTL5000_CHIP_ANA_ADC_CTRL & x"00FF",
-                                               SGTL5000_CHIP_REF_CTRL & x"01F2");   
+                                               SGTL5000_CHIP_REF_CTRL & x"01F2");
                                                
  
     
