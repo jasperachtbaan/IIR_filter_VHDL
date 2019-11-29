@@ -25,7 +25,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 USE ieee.NUMERIC_STD.ALL;
 
 entity fp_mult is
-    Generic(n : integer := 24);
+    Generic(n : integer := 24;
+            split_num : integer := 6);
+            --A split num of 1 will make n - 1 different additions
+            --A split num of a will make n/a - 1 different additions
     Port ( rst : in STD_LOGIC;
            clk : in STD_LOGIC;
            in1 : in STD_LOGIC_VECTOR ((n - 1) downto 0);
@@ -57,6 +60,8 @@ architecture Behavioral of fp_mult is
 begin
     
     process(clk, rst)
+        variable accum_temp : STD_LOGIC_VECTOR((2*n - 1) downto 0) := (others => '0');
+        variable in2_buf_temp : STD_LOGIC_VECTOR((2*n - 1) downto 0) := (others => '0');
     begin
         --This module uses a synchronous reset
         if (rising_edge(clk)) then
@@ -117,19 +122,24 @@ begin
                         
                     when processing =>
                         --res_buf <= (others => '0');
-                        
+                        accum_temp := accum;
+                        in2_buf_temp := in2_buf;
                         --If the in1_buf signal is high at some bit add the shifted in2_buf to the accumulator
-                        if (in1_buf(count) = '1') then
-                            accum <= std_logic_vector(unsigned(accum) + unsigned(in2_buf));
-                        end if;
+                        for i in 0 to (split_num - 1) loop
+                            if (in1_buf(count + i) = '1') then
+                                accum_temp := std_logic_vector(unsigned(accum_temp) + unsigned(in2_buf_temp));
+                            end if;
+                            --The input buffer is shifted left every clock cycle
+                            in2_buf_temp := in2_buf_temp((in2_buf'length - 2) downto 0) & '0';
+                        end loop;
                         
-                        --The input buffer is shifted left every clock cycle
-                        in2_buf <= in2_buf((in2_buf'length - 2) downto 0) & '0';
-                        count <= count + 1;
+                        in2_buf <= in2_buf_temp;
+                        accum <= accum_temp;
+                        count <= count + split_num;
                         
                         ready_buf <= '0';
                         
-                        if (count = (n - 1)) then
+                        if (count = (n - split_num)) then
                             state <= finalize;
                         else
                             state <= processing;

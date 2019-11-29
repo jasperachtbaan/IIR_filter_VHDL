@@ -47,23 +47,26 @@ architecture Behavioral of tb is
      signal go : STD_LOGIC;
      signal res : STD_LOGIC_VECTOR ((2*n - 1) downto 0);
      signal ready : STD_LOGIC;
+     signal out_n_bit : STD_LOGIC_VECTOR ((n - 1) downto 0);
     
 begin
     mult1 : entity work.fp_mult
-    generic map(n)
-    port map(rst,
-             clk,
-             in1,
-             in2,
-             go,
-             res,
-             ready);
+    generic map(n => n,
+                split_num => 6)
+    port map(rst => rst,
+             clk => clk,
+             in1 => in1,
+             in2 => in2,
+             go => go,
+             res => res,
+             ready => ready);
              
              
     rst <= '1', '0' after 100ns;
     go <= '0', '1' after 120ns, '0' after 130ns;
-    in1 <= "100101010100111001010101";
-    in2 <= "010111011011000011110101";
+    in1 <= "000000010011100100101011";
+    in2 <= "111001010101010110001000";
+    out_n_bit <= res((2*n - 1)) & res((2*n - 4) downto (n - 2));
     
     process
     begin
