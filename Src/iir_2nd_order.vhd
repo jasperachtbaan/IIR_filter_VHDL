@@ -71,11 +71,11 @@ architecture Behavioral of iir_2nd_order is
     signal data_in_buf : STD_LOGIC_VECTOR ((m - 1) downto 0);
     signal data_out_buf : STD_LOGIC_VECTOR ((n - 1) downto 0);
     
-    constant b0 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "00011110001001100100111000";
-    constant b1 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "11000100101111000100011000";
-    constant b2 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "00011101001000011110010001";
-    constant a1 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "01111110011100011110100100";
-    constant a2 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "11000001100010010100111111";
+    constant b0 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "00100110011101111010001100";
+    constant b1 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "10110011100001101100001011";
+    constant b2 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "00100110000000100100111001";
+    constant a1 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "01111110110110100010110110";
+    constant a2 : STD_LOGIC_VECTOR ((m - 1) downto 0) := "11000001001000110011011000";
     
     signal rst_acc1 : STD_LOGIC;
     signal in_acc1 : STD_LOGIC_VECTOR ((m - 1) downto 0);

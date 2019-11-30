@@ -72,11 +72,11 @@ package SGTL5000_pack is
                                                SGTL5000_CHIP_ANA_POWER & x"45FF",
                                                SGTL5000_CHIP_DIG_POWER & x"0073",
                                                SGTL5000_CHIP_LINE_OUT_VOL & x"1D1D",
-                                               SGTL5000_CHIP_CLK_CTRL & x"0008",
+                                               SGTL5000_CHIP_CLK_CTRL & x"000C",
                                                SGTL5000_CHIP_SSS_CTRL & x"0010", --ADC->I2S, I2S->DAC
                                                SGTL5000_CHIP_ADCDAC_CTRL & x"0000",
                                                SGTL5000_CHIP_DAC_VOL & x"3C3C",
-                                               SGTL5000_CHIP_ANA_HP_CTRL & x"3030",
+                                               SGTL5000_CHIP_ANA_HP_CTRL & x"3939",
                                                SGTL5000_CHIP_ANA_CTRL & x"0026",
                                                SGTL5000_CHIP_PAD_STRENGTH & x"0030",
                                                SGTL5000_CHIP_ANA_ADC_CTRL & x"00FF",

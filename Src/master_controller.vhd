@@ -66,8 +66,10 @@ architecture Behavioral of master_controller is
     signal setupCount : integer range 0 to setup_num;
     
     constant n : integer := 24;
-    signal in_data : STD_LOGIC_VECTOR ((n - 1) downto 0);
-    signal out_data : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    signal in_data_l : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    signal out_data_l : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    signal in_data_r : STD_LOGIC_VECTOR ((n - 1) downto 0);
+    signal out_data_r : STD_LOGIC_VECTOR ((n - 1) downto 0);
     
     signal i2s_reset_inv : STD_LOGIC;
     signal DIN_buf : STD_LOGIC;
@@ -89,7 +91,7 @@ architecture Behavioral of master_controller is
              scl => scl);
 
     i2s_1 : entity work.i2s_transceiver
-    generic map(mclk_sclk_ratio => 4,
+    generic map(mclk_sclk_ratio => 2,
                 sclk_ws_ratio => 64,
                 d_width => 24)
     port map(reset_n => i2s_reset_inv,
@@ -98,20 +100,30 @@ architecture Behavioral of master_controller is
              ws => LRCLK,
              sd_tx => DIN_SGTL5000,
              sd_rx => DOUT_SGTL5000,
-             l_data_tx => out_data,
-             r_data_tx => out_data,
-             l_data_rx => in_data,
-             r_data_rx => open);
+             l_data_tx => out_data_l,
+             r_data_tx => out_data_r,
+             l_data_rx => in_data_l,
+             r_data_rx => in_data_r);
              
-    iir1 : entity work.iir_2nd_order
+    iir_left : entity work.iir_2nd_order
     generic map(n => n,
                 extra_bits_coeff => 1,
                 extra_bits_error => 1)
     port map(clk => clk,
              rst => rst,
              clk_48k => LRCLK,
-             data_in => in_data,
-             data_out  => out_data);
+             data_in => in_data_l,
+             data_out  => out_data_l);
+    
+    iir_right : entity work.iir_2nd_order
+     generic map(n => n,
+                 extra_bits_coeff => 1,
+                 extra_bits_error => 1)
+     port map(clk => clk,
+              rst => rst,
+              clk_48k => LRCLK,
+              data_in => in_data_r,
+              data_out  => out_data_r);
                     
              
     process (clk, rst)

@@ -2,12 +2,12 @@ order = 2;
 n = 24; %Main number of bits
 extra_bit_coeff = 1; %Extra coefficient bits
 extra_bit_error = 1; %Extra internal FPGA bits for preventing roundoff errors
-wc = 0.0065; %*pi
-T = 1/46800;
+wc = 0.0033; %*pi
+T = 1/(46800*2);
 max_exp = 1;
 
 %[b,a] = butter(order,wc,'high');
-[b,a] = designShelvingEQ(6,order/2,wc,'lo' ,'Orientation', 'row');
+[b,a] = designShelvingEQ(-7,order/2,wc,'lo' ,'Orientation', 'row');
 sys = tf(b, a, 1);
 %Make sure that the filter cannot clip with a fixed point implementation
 b = b * 0.99 / sum(abs(impulse(sys)));
