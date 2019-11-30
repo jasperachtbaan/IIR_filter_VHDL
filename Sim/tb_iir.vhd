@@ -44,12 +44,14 @@ architecture Behavioral of tb_iir is
     
 begin
     iir1 : entity work.iir_2nd_order
-    generic map(n)
-    port map(clk,
-             rst,
-             clk_48k,
-             data_in,
-             data_out);
+    generic map(n => n,
+                extra_bits_coeff => 1,
+                extra_bits_error => 1)
+    port map(clk => clk,
+             rst => rst,
+             clk_48k => clk_48k,
+             data_in => data_in,
+             data_out => data_out);
 
     process
     begin

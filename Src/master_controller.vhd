@@ -104,7 +104,9 @@ architecture Behavioral of master_controller is
              r_data_rx => open);
              
     iir1 : entity work.iir_2nd_order
-    generic map(n)
+    generic map(n => n,
+                extra_bits_coeff => 1,
+                extra_bits_error => 1)
     port map(clk => clk,
              rst => rst,
              clk_48k => LRCLK,
